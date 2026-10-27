@@ -1,0 +1,16 @@
+Actividad Nro. 1
+
+Patrones:
+
+  (1) STRATEGY: Se utilizará el patrón strategy para desacoplar la lógica de AgenteIA de los detalles de comunicación con cada LLM.
+
+                Para ello se definirá una interfaz que establezca cómo generar contenido y varias implementaciones intercambiables.
+
+                Esto permitira poder intercambiar e incorporar nuevos proveedores de una manera sencilla sin modificar la clase AgenteIA.
+
+
+  (2) FACTORY METHOD: Se utlizará dicho patrón para permitir que la clase Respuesta se abstraiga de la implementacion de usuarios y
+                      agentes permitiendo que los trate de igual manera.
+
+                      Además Si la creación del agente requiere configuración, selección de proveedor o inicialización adicional,
+                      esa lógica podría repetirse en varios lugares.
