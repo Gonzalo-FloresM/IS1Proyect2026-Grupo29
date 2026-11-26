@@ -1,6 +1,6 @@
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from datetime import datetime
 from is1proyect2026_grupo29.database.base import Base
 
 
@@ -21,9 +21,10 @@ class Pregunta(Base):
         nullable=False,
     )
 
-    fecha: Mapped[int] = mapped_column(
-        Integer,
+    fecha: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         nullable=False,
+        server_default=func.now(),
     )
 
     # Relación con Categoria
