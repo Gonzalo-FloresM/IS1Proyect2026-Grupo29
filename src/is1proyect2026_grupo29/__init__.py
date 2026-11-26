@@ -1,9 +1,13 @@
 from flask import Flask, g
 from is1proyect2026_grupo29.database import get_db_session
+from is1proyect2026_grupo29.routes.categorias import categorias_bp
 from sqlalchemy import text
+
 
 def create_app():
     app = Flask(__name__)
+    
+    app.register_blueprint(categorias_bp)
 
     @app.teardown_appcontext
     def close_db_session(exception=None):
