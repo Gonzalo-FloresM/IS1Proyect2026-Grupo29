@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import Boolean, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from is1proyect2026_grupo29.database.base import Base
@@ -22,12 +22,11 @@ class Respuesta(Base):
         default=False,
     )
 
-    puntuacion: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-        default=0,
-    )
-
+    """Calcula la puntuación sumando los votos recibidos."""
+    @property
+    def puntuacion(self) -> int:
+        return sum(voto.valor for voto in self.votos)
+    
     tipo: Mapped[str] = mapped_column(String(30))
 
     pregunta_id: Mapped[int] = mapped_column(
@@ -46,6 +45,10 @@ class Respuesta(Base):
 
     autor: Mapped["Autor"] = relationship(
         back_populates="respuestas",
+    )
+    
+    votos: Mapped[list["Voto"]] = relationship(
+        back_populates="respuesta",
     )
 
     __mapper_args__ = {

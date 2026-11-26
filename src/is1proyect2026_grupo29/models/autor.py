@@ -46,6 +46,10 @@ class User(Autor):
     preguntas: Mapped[list["Pregunta"]] = relationship(
         back_populates="usuario",
     )
+    
+    votos: Mapped[list["Voto"]] = relationship(
+        back_populates="usuario",
+    )
 
     __mapper_args__ = {
         "polymorphic_identity": "usuario",
