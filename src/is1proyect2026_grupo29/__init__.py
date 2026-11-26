@@ -4,6 +4,7 @@ from is1proyect2026_grupo29.routes.categorias import categorias_bp
 from is1proyect2026_grupo29.routes.preguntas import preguntas_bp
 from is1proyect2026_grupo29.routes.tags import tags_bp
 from is1proyect2026_grupo29.routes.respuestas import respuestas_bp
+from is1proyect2026_grupo29.routes.votos import votos_bp
 
 from sqlalchemy import text
 
@@ -14,7 +15,8 @@ def create_app():
     app.register_blueprint(categorias_bp)
     app.register_blueprint(preguntas_bp)
     app.register_blueprint(tags_bp)
-    app.register_blueprint(respuestas_bp)    
+    app.register_blueprint(respuestas_bp)
+    app.register_blueprint(votos_bp)    
 
     @app.teardown_appcontext
     def close_db_session(exception=None):
