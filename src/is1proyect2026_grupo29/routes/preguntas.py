@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from is1proyect2026_grupo29.database import get_db_session
-from is1proyect2026_grupo29.models import Pregunta, Categoria, User
+from is1proyect2026_grupo29.models import Pregunta, Categoria, User, Tag
 
 
 preguntas_bp = Blueprint(
@@ -200,3 +200,104 @@ def eliminar_pregunta(pregunta_id):
             "error": "No se pudo eliminar la pregunta. Puede tener respuestas asociadas."
         }), 409
 
+
+@preguntas_bp.route("/<int:pregunta_id>/tags", methods=["GET"])
+def listar_tags_pregunta(pregunta_id):
+    session = get_db_session()
+
+    pregunta = session.get(Pregunta, pregunta_id)
+
+    if pregunta is None:
+        return jsonify({"error": "Pregunta no encontrada"}), 404
+
+    resultado = [
+        {
+            "id": tag.id,
+            "descripcion": tag.descripcion,
+        }
+        for tag in pregunta.tags
+    ]
+
+    return jsonify(resultado), 200
+
+
+
+@preguntas_bp.route("/<int:pregunta_id>/tags", methods=["POST"])
+def asociar_tag(pregunta_id):
+    session = get_db_session()
+
+    pregunta = session.get(Pregunta, pregunta_id)
+
+    if pregunta is None:
+        return jsonify({"error": "Pregunta no encontrada"}), 404
+
+    datos = request.get_json(silent=True)
+
+    if not datos:
+        return jsonify({"error": "Se requiere un objeto JSON"}), 400
+
+    tag_id = datos.get("tag_id")
+
+    if not isinstance(tag_id, int) or isinstance(tag_id, bool):
+        return jsonify({"error": "El tag_id debe ser un entero"}), 400
+
+    tag = session.get(Tag, tag_id)
+
+    if tag is None:
+        return jsonify({"error": "Tag no encontrado"}), 404
+
+    if tag in pregunta.tags:
+        return jsonify({"error": "El tag ya esta asociado a esta pregunta"}), 409
+
+    try:
+        pregunta.tags.append(tag)
+        session.commit()
+
+        return jsonify({
+            "mensaje": "Tag asociado correctamente",
+            "pregunta_id": pregunta.id,
+            "tag_id": tag.id,
+        }), 201
+
+    except Exception:
+        session.rollback()
+        return jsonify({"error": "No se pudo asociar el tag"}), 500
+
+
+@preguntas_bp.route(
+    "/<int:pregunta_id>/tags/<int:tag_id>",
+    methods=["DELETE"]
+)
+def desasociar_tag(pregunta_id, tag_id):
+    session = get_db_session()
+
+    pregunta = session.get(Pregunta, pregunta_id)
+
+    if pregunta is None:
+        return jsonify({"error": "Pregunta no encontrada"}), 404
+
+    tag = session.get(Tag, tag_id)
+
+    if tag is None:
+        return jsonify({"error": "Tag no encontrado"}), 404
+
+    if tag not in pregunta.tags:
+        return jsonify({
+            "error": "El tag no esta asociado a esta pregunta"
+        }), 404
+
+    try:
+        pregunta.tags.remove(tag)
+        session.commit()
+
+        return jsonify({
+            "mensaje": "Tag desasociado correctamente",
+            "pregunta_id": pregunta.id,
+            "tag_id": tag.id,
+        }), 200
+
+    except Exception:
+        session.rollback()
+        return jsonify({
+            "error": "No se pudo desasociar el tag"
+        }), 500
